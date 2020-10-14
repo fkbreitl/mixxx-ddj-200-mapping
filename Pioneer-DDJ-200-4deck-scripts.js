@@ -76,23 +76,15 @@ DDJ200.play = function (channel, control, value, status, group) {
     //midi.sendShortMsg(v, control, 0x7F * engine.getValue(vgroup, "play"));
 };
 
-DDJ200.Deck = function (deckNumbers, midiChannel)
-    { components.Deck.call(this, deckNumbers);
-      this.volume = new components.Pot({
-          midi: [0xB0 + midiChannel, 0x33],
-                  inKey: 'volume',
-                  });      
-    };
+DDJ200.leftDeckvolumeMSB = function(channel, control, value) {
+    DDJ200.leftVolumeMSB = value; // just defining rough position
+};
 
-//DDJ200.volume = function (channel, control, value, status, group) {
-//    if (value === 0) { return; }
-//    deckNumber = script.deckFromGroup(group);
-    //var v = engine.getParameter("[Channel1]", "volume");
-    //engine.setValue(group, "volume", value / 0x3FFF);
-//    var v = (value << 7) / 0x3FFF;
-//    print(value << 7);
-    //    print(script.absoluteLin(value,0,1,0,127));
-//};
+DDJ200.leftDeckvolumeLSB = function(channel, control, value, status, group) {
+    var fullValue = (DDJ200.leftVolumeMSB << 7) + value;
+    var position = fullValue / 0x3FFF;
+    engine.setParameter(group, "volume", position);
+};
     
 DDJ200.initLEDs = function (channel, control, value, status, group) {
     midi.sendShortMsg(0x90+channel, 0x0B,
